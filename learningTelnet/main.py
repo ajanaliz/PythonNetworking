@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import telnetlib, time
-
+#a python program to telnet into a device, send commands or read command outputs
 
 # Open telnet connection to devices
 def open_telnet_conn(ip):
