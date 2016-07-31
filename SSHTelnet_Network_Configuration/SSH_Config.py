@@ -40,8 +40,8 @@ def ip_is_valid():
             a = ip.split('.')
 
             if (len(a) == 4) and (1 <= int(a[0]) <= 223) and (int(a[0]) != 127) and (
-                    int(a[0]) != 169 or int(a[1]) != 254) and (
-                            0 <= int(a[1]) <= 255 and 0 <= int(a[2]) <= 255 and 0 <= int(a[3]) <= 255):
+                            int(a[0]) != 169 or int(a[1]) != 254) and (
+                                    0 <= int(a[1]) <= 255 and 0 <= int(a[2]) <= 255 and 0 <= int(a[3]) <= 255):
                 check = True
                 break
             else:
@@ -174,58 +174,60 @@ def open_ssh_conn(ip):
         # connect to the device using username and password
         session.connect(ip, username=username, password=password)
 
-        #start an interactive shell session on the router
+        # start an interactive shell session on the router
         connection = session.invoke_shell()
 
-        #setting terminal length for entire output - disable pagination
+        # setting terminal length for entire output - disable pagination
         connection.send("terminal length 0\n")
         time.sleep(1)
 
-        #Entering global config mode
+        # Entering global config mode
         connection.send("\n")
         connection.send("configure terminal\n")
         time.sleep(1)
 
-        #Open user selected file for reading
+        # Open user selected file for reading
         selected_cmd_file = open(cmd_file, 'r')
 
-        #starting from the beginning of the file
+        # starting from the beginning of the file
         selected_cmd_file.seek(0)
 
-        #Writing each line in the file to the device
+        # Writing each line in the file to the device
         for each_line in selected_cmd_file.readlines():
             connection.send(each_line + '\n')
             time.sleep(2)
 
-        #Closing the user file
+        # Closing the user file
         selected_user_file.close()
 
-        #Closing the command file
+        # Closing the command file
         selected_cmd_file.close()
 
-        #Checking command output for IOS syntax errors
+        # Checking command output for IOS syntax errors
         router_output = connection.recv(65535)
 
-        if re.search(r"% Invalid input detected at" , router_output):
+        if re.search(r"% Invalid input detected at", router_output):
             print("* There was at least one IOS syntax error on device %s" % ip)
         else:
             print("\nDONE for device %s" % ip)
 
-        #Test for reading command output
+        # Test for reading command output
         # print(router_output + "\n")
 
-        #Closing the connection
+        # Closing the connection
         session.close()
 
     except paramiko.AuthenticationException:
-        print("* Invalid username or password. \n* Please check the username/password file or the device configuration!")
+        print(
+            "* Invalid username or password. \n* Please check the username/password file or the device configuration!")
         print("* Closing program...\n")
 
-#calling threads creation function
+
+# calling threads creation function
 def create_threads():
     threads = []
     for ip in ip_list:
-        th = threading.Thread(target=open_ssh_conn, args= (ip,)) #args is a tuple with a single element
+        th = threading.Thread(target=open_ssh_conn, args=(ip,))  # args is a tuple with a single element
         th.start()
         threads.append(th)
 
@@ -233,7 +235,7 @@ def create_threads():
         th.join()
 
 
-#calling threads creation function
+# calling threads creation function
 create_threads()
 
-#End of script
+# End of script
